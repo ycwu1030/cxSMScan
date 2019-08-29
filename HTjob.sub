@@ -1,0 +1,21 @@
+universe                        = vanilla
+accounting_group                = long
+requirements                    =  
+executable                      = HTSingleRun.sh
+arguments                       = "cxSMPoints_cxx_$(Process).dat cxSMPoints_py_$(Process).dat $(Process)"
+transfer_input_files            = cmt,cxSMThermalMassOnly,cxSMScannerFull.py cxSMTransitionsPhysBasis.py
+should_transfer_files           = IF_NEEDED
+when_to_transfer_output         = ON_EXIT
+initialdir                      = run$(Process)
+
+transfer_output                 = true
+transfer_error                  = true
+transfer_executable             = true
+
+
+
+log                             = cxSMPoints_$(Process).condor.log
+output                          = cxSMPoints_$(Process).stdout
+error                           = cxSMPoints_$(Process).stderr
+
+queue 10

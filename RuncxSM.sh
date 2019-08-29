@@ -12,6 +12,6 @@ mkdir -p $datadir/cosmo
 while [ $id -le 10 ]
   do
     printf -v ID "%02d" ${id}
-    screen -S CXSM0802"$ID" -d -m bash -c "./cxSMSingleRun.sh $datadir "$id"; exec bash;"
+    screen -S CXSM0828"$ID" -d -m bash -c "./cxSMSingleRun.sh $datadir "$id"; exec bash;"
     id=$[$id+1]
   done
