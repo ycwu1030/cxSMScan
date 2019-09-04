@@ -21,7 +21,7 @@ FLIBS = $(gsllibs) $(boostlibs)
 SRC = $(wildcard $(SRCDIR)/*.cpp)
 OBJ = $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SRC))
 
-all: cxSMCritical_Scan.x
+all: cxSMCritical_Scan.x cxSMCritical_Scan_Z2.x cxSMCritical_Scan_HT.x cxSMCritical_Scan_Z2_HT.x
 
 .PHONY: clean
 

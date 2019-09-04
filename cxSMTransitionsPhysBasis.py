@@ -47,6 +47,27 @@ class cxSM(generic_potential.generic_potential):
         self.a1 = a1
         # print self.theta, self.mu2, self.lam, self.b1, self.b2, self.d2, self.delta2, self.a1
 
+    def SetParametersZ2(self,mHH,mHA,d2,del2):
+        MHH2 = mHH**2
+        MHL2 = mh**2
+        MHA2 = mHA**2
+        vev = v
+
+        self.d2 = d2
+        self.del2 = del2
+        self.lam = MHL2/2.0/vev/vev
+        self.b1 = MHH2-MHA2
+        self.b2 = MHH2+MHA2-del2/2.0*vev*vev
+        self.mu2 = -self.lam*vev*vev
+        ##
+        self.vS = 0
+        self.mHH = mHH
+        self.mHA = mHA
+        self.theta = 0
+        self.a1 = 0
+        # print self.theta, self.mu2, self.lam, self.b1, self.b2, self.d2, self.delta2, self.a1
+
+
     # check for bounded from below condition, return False if not satisfied
     def forbidPhaseCrit(self, X):
         """

@@ -103,6 +103,9 @@ public:
     double b2;
     double d2;
 
+// Whether Z2
+    bool Z2;
+
 // Physical Parameters:
     double MHH;
     double MHH2;

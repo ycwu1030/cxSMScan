@@ -16,7 +16,7 @@ int CriticalDF(const gsl_vector * x, void *model, gsl_matrix *J);
 int CriticalFDF(const gsl_vector * x, void *model, gsl_vector * f, gsl_matrix * J);
 // int FindCriticalPointsSingle(CXSM *model, double *res, int MAXITER=1000, bool usingdf=true);
 int FindCriticalPoints(CXSM *model, double *res, std::string &logs, int MAXITER=1000, bool usingdf=true);
-int FindCriticalPointsZ2(CXSM *model, double *res, int MAXITER=1000, bool usingdf=false);
+int FindCriticalPointsZ2(CXSM *model, double *res,std::string &logs, int MAXITER=1000, bool usingdf=true);
 // For finding the minimum
 struct MinParam
 {

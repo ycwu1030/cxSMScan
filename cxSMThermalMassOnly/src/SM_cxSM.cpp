@@ -51,6 +51,8 @@ void CXSM::SetInput(double VSin, double MHHin, double MHAin, double thetain, dou
     del2 = sin(2*theta)*(MHL2-MHH2)/vev/VS;
     b1 = -(sqrt(2)*a1+MHA2*VS)/VS;
     d2 = (2*sqrt(2)*a1+VS*cos(2*theta)*(MHH2-MHL2)+VS*(MHH2+MHL2))/(pow(VS,3));
+
+    Z2 = false;
 }
 
 void CXSM::SetInputZ2(double MHHin,double MHAin,double d2in, double del2in)
@@ -69,6 +71,8 @@ void CXSM::SetInputZ2(double MHHin,double MHAin,double d2in, double del2in)
     b1 = MHH2 - MHA2;
     b2 = MHH2 + MHA2 - del2/2.0*vev*vev;
     mu2 = -lam*vev*vev;
+
+    Z2 = true;
 }
 
 double CXSM::VT0(double phiH, double phiS)

@@ -477,84 +477,130 @@ void print_state_z2 (size_t iter, gsl_multiroot_fdfsolver * s)
           gsl_vector_get (s->f, 1),
           gsl_vector_get (s->f, 2));
 }
-int FindCriticalPointsZ2(CXSM *model, double *res, int MAXITER, bool usingdf)
+int MultiRootIterFDF_Z2(CXSM *model, double *InitialGuess, double *res, int MAXITER)
 {
     const size_t n = 3;
     int status;
-    size_t i, iter = 0;
-    double phiHC,phiSC,phiHB,phiSB,Tc;
-    double InitialGuess[n];
+    size_t iter = 0;
     gsl_vector * x = gsl_vector_alloc(n);
-    model->FindLocalMinimumT0();
-    InitialGuess[1]=model->vev;
-    InitialGuess[0]=MAX(model->LocalMinimumT0ZERO,model->NLocalMinimaT0ZERO);
-    InitialGuess[2]=100.0;
-    for (int j = 0; j < n; ++j)
+    for (int i = 0; i < n; ++i)
     {
-        gsl_vector_set(x,j,InitialGuess[j]);
+        gsl_vector_set(x, i, InitialGuess[i]);
     }
+    const gsl_multiroot_fdfsolver_type *T;
+    gsl_multiroot_fdfsolver *s;
+    gsl_multiroot_function_fdf FF = {&CriticalZ2F,&CriticalZ2DF,&CriticalZ2FDF,n,model};
+    // T = gsl_multiroot_fdfsolver_gnewton;
+    T = gsl_multiroot_fdfsolver_hybridsj;
+    s = gsl_multiroot_fdfsolver_alloc(T,n);
+    gsl_multiroot_fdfsolver_set(s, &FF, x);
+#ifdef DEBUG
+    print_state_z2(iter,s);
+#endif
+    do{
+        iter++;
+        status = gsl_multiroot_fdfsolver_iterate(s);
+#ifdef DEBUG
+        print_state_z2(iter,s);
+#endif
+        if (status) break;
+        status = gsl_multiroot_test_residual(s->f,1e-6);
+    } while (status == GSL_CONTINUE && iter < MAXITER);
+#ifdef DEBUG
+    print_state_z2(iter,s);
+#endif
+    for (int i = 0; i < n; ++i)
+    {
+        res[i] = gsl_vector_get(s->x,i);
+    }
+    gsl_multiroot_fdfsolver_free(s);
+    gsl_vector_free(x);  
+    return status;
+}
+int MultiRootIterF_Z2(CXSM *model, double *InitialGuess, double *res, int MAXITER)
+{
+    const size_t n = 3;
+    int status;
+    size_t iter = 0;
+    gsl_vector * x = gsl_vector_alloc(n);
+    for (int i = 0; i < n; ++i)
+    {
+        gsl_vector_set(x, i, InitialGuess[i]);
+    }
+    const gsl_multiroot_fsolver_type *T;
+    gsl_multiroot_fsolver *s;
+    gsl_multiroot_function FF = {&CriticalZ2F,n,model};
+    // T = gsl_multiroot_fdfsolver_gnewton;
+    T = gsl_multiroot_fsolver_hybrids;
+    s = gsl_multiroot_fsolver_alloc(T,n);
+    gsl_multiroot_fsolver_set(s, &FF, x);
+#ifdef DEBUG
+    print_state_z2(iter,s);
+#endif
+    do{
+        iter++;
+        status = gsl_multiroot_fsolver_iterate(s);
+        // status = gsl_multiroot_fsolver_iterate(s);
+#ifdef DEBUG
+        print_state_z2(iter,s);
+#endif
+        if (status) break;
+        status = gsl_multiroot_test_residual(s->f,1e-6);
+    } while (status == GSL_CONTINUE && iter < MAXITER);
+#ifdef DEBUG
+    print_state_z2(iter,s);
+#endif
+    for (int i = 0; i < n; ++i)
+    {
+        res[i] = gsl_vector_get(s->x,i);
+    }
+    gsl_multiroot_fsolver_free(s);
+    gsl_vector_free(x);  
+    return status;
+}
+int FindCriticalPointsSingle_Z2(CXSM *model, double *InitialGuess, double *res, int MAXITER, bool usingdf)
+{
     if (usingdf)
     {
-        const gsl_multiroot_fdfsolver_type *T;
-        gsl_multiroot_fdfsolver *s;
-        gsl_multiroot_function_fdf FF = {&CriticalZ2F,&CriticalZ2DF,&CriticalZ2FDF,n,model};
-        iter = 0;
-        T = gsl_multiroot_fdfsolver_gnewton;
-        s = gsl_multiroot_fdfsolver_alloc(T,n);
-        gsl_multiroot_fdfsolver_set(s, &FF, x);
-#ifdef DEBUG
-        print_state_df(iter,s);
-#endif
-        do{
-            iter++;
-            status = gsl_multiroot_fdfsolver_iterate(s);
-            // status = gsl_multiroot_fsolver_iterate(s);
-#ifdef DEBUG
-            print_state_df(iter,s);
-#endif
-            if (status) break;
-            status = gsl_multiroot_test_residual(s->f,n*1.0);
-        } while (status == GSL_CONTINUE && iter < MAXITER);
-#ifdef DEBUG
-        print_state_df(iter,s);
-#endif
-        for (int i = 0; i < n; ++i)
-        {
-            res[i] = gsl_vector_get(s->x,i);
-        }
-        gsl_multiroot_fdfsolver_free(s);
+        return MultiRootIterFDF_Z2(model, InitialGuess, res, MAXITER);
     }
     else
     {
-        const gsl_multiroot_fsolver_type *T;
-        gsl_multiroot_fsolver *s;
-        gsl_multiroot_function FF = {&CriticalZ2F,n,model};
-        T = gsl_multiroot_fsolver_dnewton;
-        s = gsl_multiroot_fsolver_alloc(T,n);
-        gsl_multiroot_fsolver_set(s, &FF, x);
-        iter = 0;
-#ifdef DEBUG
-        print_state(iter,s);
-#endif
-        do{
-            iter++;
-            status = gsl_multiroot_fsolver_iterate(s);
-            // status = gsl_multiroot_fsolver_iterate(s);
-#ifdef DEBUG
-            print_state(iter,s);
-#endif
-            if (status) break;
-            status = gsl_multiroot_test_residual(s->f,n*1.0);
-        } while (status == GSL_CONTINUE && iter < MAXITER);
-#ifdef DEBUG
-        print_state(iter,s);
-#endif
-        for (int i = 0; i < n; ++i)
-        {
-            res[i] = gsl_vector_get(s->x,i);
-        }
-        gsl_multiroot_fsolver_free(s);
+        return MultiRootIterF_Z2(model, InitialGuess, res, MAXITER);
     }
-    gsl_vector_free(x);  
-    return status;
+}
+int FindCriticalPointsZ2(CXSM *model, double *res, std::string &logs, int MAXITER, bool usingdf)
+{
+    double InitialGuess[3];
+    int TotalStatus = GSL_CONTINUE;
+    int status;
+    double phiSC,phiHB,Tc;
+    logs = "";
+    char temp[200];
+    for (int izero = 0; izero < model->NLocalMinimaT0ZERO; ++izero)
+    {
+        InitialGuess[0] = model->LocalMinimumT0ZERO[izero];
+        InitialGuess[1] = model->vev;
+        InitialGuess[2] = 100.0;
+        status = FindCriticalPointsSingle_Z2(model, InitialGuess, res, MAXITER, usingdf);
+        if (status != GSL_SUCCESS)
+        {
+            continue;
+        }
+        phiSC = res[0];
+        phiHB = res[1];
+        Tc = res[2];
+        if (CloseToEachOther(0.0,phiHB))
+        {
+            continue;
+        }
+        if (Tc<0 || !model->CheckHessianMatrix(0.0,phiSC,Tc) || !model->CheckHessianMatrix(phiHB,0.0,Tc))
+        {
+            continue;
+        }
+        sprintf(temp,"STATUS: %d; Tc: %f, From (0.0,%f)->(%f,0.0)",status,Tc,phiSC,phiHB);
+        logs += temp;
+        TotalStatus = GSL_SUCCESS;
+    }
+    return TotalStatus;
 }

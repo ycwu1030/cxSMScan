@@ -1,0 +1,20 @@
+universe                        = vanilla
+accounting_group                = long
+requirements                    =  
+executable                      = HTSingleRunZ2.sh
+arguments                       = "cxSMPointsZ2_cxx_$(Process).dat cxSMPointsZ2_py_$(Process).dat $(Process)"
+transfer_input_files            = cmt,cxSMThermalMassOnly,cxSMScannerFullZ2.py cxSMTransitionsPhysBasis.py
+should_transfer_files           = IF_NEEDED
+when_to_transfer_output         = ON_EXIT
+
+transfer_output                 = true
+transfer_error                  = true
+transfer_executable             = true
+
+
+
+log                             = cxSMPointsZ2_$(Process).condor.log
+output                          = cxSMPointsZ2_$(Process).stdout
+error                           = cxSMPointsZ2_$(Process).stderr
+
+queue __TIMES__
