@@ -315,10 +315,10 @@ void CXSM::PrintLocalMinimumT0()
     for (int i = 0; i < NLocalMinimaT0ZERO; ++i)
     {
         Hessian=CheckHessianMatrix(0,LocalMinimumT0ZERO[i]);
-        if (!Hessian)
-        {
-            continue;
-        }
+        // if (!Hessian)
+        // {
+        //     continue;
+        // }
         cout<<i+1<<"\tvH:\t"<<0.0<<"\tvS:\t"<<LocalMinimumT0ZERO[i]<<"\t\t"<<Hessian<<"\tV:"<<VT0(0,LocalMinimumT0ZERO[i])<<endl;
     }
     for (int i = 0; i < NLocalMinimaT0NONZERO; ++i)
@@ -398,7 +398,7 @@ bool CXSM::CheckGlobalMinimum()
     }
     for (int i = 0; i < NLocalMinimaT0NONZERO; ++i)
     {
-        if (abs(vev - LocalMinimumT0NONZERO[i][0])<0.1&&abs(VS - LocalMinimumT0NONZERO[i][1]))
+        if (abs(vev - LocalMinimumT0NONZERO[i][0])<0.1&&abs(VS - LocalMinimumT0NONZERO[i][1])<0.1)
         {
             continue;
         }
